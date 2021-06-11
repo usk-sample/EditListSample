@@ -11,6 +11,8 @@ struct ContentView: View {
     
     @State private var fruits = ["apple", "orange", "banana", "pineapple", "strawberry", "mango", "melon"]
     
+    @State var editMode: EditMode = .inactive
+    
     var body: some View {
         NavigationView {
             
@@ -18,16 +20,20 @@ struct ContentView: View {
                 ForEach.init(fruits, id: \.self) { fruit in
                     Text(fruit)
                 }.onDelete(perform: { indexSet in
-                    debugPrint(indexSet)
                     self.fruits.remove(atOffsets: indexSet)
                 }).onMove(perform: { indices, newOffset in
-                    debugPrint(indices)
-                    debugPrint(newOffset)
                     self.fruits.move(fromOffsets: indices, toOffset: newOffset)
                 })
             }
             .navigationBarTitle("Edit List", displayMode: .inline)
-            .navigationBarItems(trailing: EditButton())
+            .navigationBarItems(trailing: Button.init(action: { self.editMode = self.editMode.isEditing ? .inactive : .active }, label: {
+                if self.editMode.isEditing {
+                    Image.init(systemName: "checkmark")
+                } else {
+                    Image.init(systemName: "square.and.pencil")
+                }
+            }))
+            .environment(\.editMode, self.$editMode)
             
         }
     }
